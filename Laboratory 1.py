@@ -1,11 +1,9 @@
 import os
 import time
 
-# Enable ANSI escape sequences for Windows console
 if os.name == 'nt':
     os.system('')
 
-# --- ANSI COLOR ESCAPE SEQUENCES ---
 RED_BG = '\033[41m'
 WHITE_BG = '\033[47m'
 BLUE_BG = '\033[44m'
@@ -13,115 +11,103 @@ GREEN_BG = '\033[42m'
 YELLOW_BG = '\033[43m'
 RESET = '\033[0m'
 
-def draw_flag():
-    print("--- 1. Flag of the Netherlands ---")
-    width = 30
-    # Print 2 lines for each color
+def dibujar_bandera():
+    print("--- 1. Bandera de Países Bajos ---")
+    ancho = 30
     for _ in range(2):
-        print(RED_BG + " " * width + RESET)
+        print(RED_BG + " " * ancho + RESET)
     for _ in range(2):
-        print(WHITE_BG + " " * width + RESET)
+        print(WHITE_BG + " " * ancho + RESET)
     for _ in range(2):
-        print(BLUE_BG + " " * width + RESET)
+        print(BLUE_BG + " " * ancho + RESET)
     print("\n")
 
-def draw_pattern():
-    print("--- 2. Repeating Pattern ---")
-    # Generate the crossed diamond pattern based on the provided image
-    width = 40
-    height = 5
+def dibujar_patron():
+    print("--- 2. Patrón ---")
+    ancho = 40
+    alto = 5
     
-    for i in range(height):
-        line = ""
-        for j in range(width):
-            # Calculate positions for backslashes, forward slashes, and intersections
+    for i in range(alto):
+        linea = ""
+        for j in range(ancho):
             if i == 2 and j % 6 == 2:
-                line += "X"
+                linea += "X"
             elif j % 6 == i:
-                line += "\\"
+                linea += "\\"
             elif j % 6 == 4 - i:
-                line += "/"
+                linea += "/"
             else:
-                line += " "
-        print(line)
+                linea += " "
+        print(linea)
     print("\n")
 
-def analyze_sequence():
-    print("--- 4. sequence.txt Analysis ---")
-    numbers = []
+def analizar_secuencia():
+    print("--- 4. Análisis de sequence.txt ---")
+    numeros = []
     
-    # Attempt 
     try:
-        with open("sequence.txt", "r") as file:
-            for line in file:
-                # If there are multiple numbers on a line separated by spaces
-                for num in line.split(): 
-                    numbers.append(float(num))
+        with open("sequence.txt", "r") as archivo:
+            for linea in archivo:
+                for num in linea.split(): 
+                    numeros.append(float(num))
     except FileNotFoundError:
-        print("File 'sequence.txt' not found! Using test data instead...")
-        numbers = [10.5, -5.0, 20.1, -15.2, 8.0, 10.0]
+        print("Archivo no encontrado. Usando datos de prueba...")
+        numeros = [10.5, -5.0, 20.1, -15.2, 8.0, 10.0]
 
-    if not numbers:
-        print("The file is empty.")
+    if not numeros:
         return
 
-    # Condition: Sum of absolute values at even and odd positions
-    sum_even = 0
-    sum_odd = 0
+    suma_pares = 0
+    suma_impares = 0
 
-    for i in range(len(numbers)):
-        if i % 2 == 0: # Even indices (0, 2, 4...)
-            sum_even += abs(numbers[i])
-        else:          # Odd indices (1, 3, 5...)
-            sum_odd += abs(numbers[i])
+    for i in range(len(numeros)):
+        if i % 2 == 0:
+            suma_pares += abs(numeros[i])
+        else:
+            suma_impares += abs(numeros[i])
 
-    total = sum_even + sum_odd
+    total = suma_pares + suma_impares
     
     if total > 0:
-        percent_even = (sum_even / total) * 100
-        percent_odd = (sum_odd / total) * 100
+        porcentaje_pares = (suma_pares / total) * 100
+        porcentaje_impares = (suma_impares / total) * 100
 
-        print(f"Sum of even positions: {percent_even:.1f}%")
-        print(f"Sum of odd positions: {percent_odd:.1f}%")
+        print(f"Suma posiciones pares: {porcentaje_pares:.1f}%")
+        print(f"Suma posiciones impares: {porcentaje_impares:.1f}%")
 
-        # Generate the chart with colors (40 characters wide)
-        bar_width = 40
-        blocks_even = int((percent_even / 100) * bar_width)
-        blocks_odd = bar_width - blocks_even
+        ancho_barra = 40
+        bloques_pares = int((porcentaje_pares / 100) * ancho_barra)
+        bloques_impares = ancho_barra - bloques_pares
 
-        print("Chart (Green = Even, Yellow = Odd):")
-        print(GREEN_BG + " " * blocks_even + YELLOW_BG + " " * blocks_odd + RESET)
+        print("Diagrama (Verde = Pares, Amarillo = Impares):")
+        print(GREEN_BG + " " * bloques_pares + YELLOW_BG + " " * bloques_impares + RESET)
     print("\n")
 
-def draw_graph():
-    print("--- EXTRA TASK: Graph for y = 2x ---")
-    height = 9 # Minimum 9 lines high according to instructions
-    width = 10
+def dibujar_grafico():
+    print("--- Tarea Extra: Gráfico y = 2x ---")
+    alto = 9 
+    ancho = 10
     
-    # The console prints from top to bottom, so 'y' goes from 8 down to 0
-    for y in range(height - 1, -1, -1):
-        line = f"{y} |" # Y-axis
-        for x in range(width):
-            # Condition for the function y = 2x
+    for y in range(alto - 1, -1, -1):
+        linea = f"{y} |" 
+        for x in range(ancho):
             if y == 2 * x:
-                line += " * "
+                linea += " * "
             else:
-                line += "   "
-        print(line)
+                linea += "   "
+        print(linea)
     
-    # Print the X-axis
-    print("  +" + "-" * (width * 3))
-    x_axis = "   "
-    for x in range(width):
-        x_axis += f" {x} "
-    print(x_axis)
+    print("  +" + "-" * (ancho * 3))
+    eje_x = "   "
+    for x in range(ancho):
+        eje_x += f" {x} "
+    print(eje_x)
     print("\n")
 
-def animate():
-    print("--- 3. Animation ---")
-    input("Press ENTER to start the animation ...")
+def animacion():
+    print("--- 3. Animación ---")
+    input("Presiona ENTER para iniciar...")
     
-    # 4 simple frames
     frames = [
         "   (•_•)   \n   <)   )╯ \n    /  \\   ",
         "   ( •_•)  \n   \\(   (> \n    /  \\   ",
@@ -129,19 +115,17 @@ def animate():
         "   ( •_•)  \n   \\(   (> \n    /  \\   "
     ]
     
-    for _ in range(2): # Repeat the animation a couple of times
+    for _ in range(3):
         for frame in frames:
-            # os.system("cls") clears the console on Windows "clear" 
-            command = "cls" if os.name == "nt" else "clear"
-            os.system(command)
+            comando = "cls" if os.name == "nt" else "clear"
+            os.system(comando)
             print("\n" * 5)
             print(frame)
-            time.sleep(0.4) # Pause between frames
+            time.sleep(0.4) 
 
-# Execute all functions in order
 if __name__ == "__main__":
-    draw_flag()
-    draw_pattern()
-    analyze_sequence()
-    draw_graph()
-    animate()
+    dibujar_bandera()
+    dibujar_patron()
+    analizar_secuencia()
+    dibujar_grafico()
+    animacion()

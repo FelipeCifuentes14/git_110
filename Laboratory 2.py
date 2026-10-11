@@ -2,103 +2,90 @@ import csv
 import random
 import xml.etree.ElementTree as ET
 
-def process_csv(filename="books.csv"):
-    books = []
+def procesar_libros(archivo="books.csv"):
+    libros = []
     
-    # Чтение файла. Часто используется кодировка windows-1251 для русских CSV.
     try:
-        with open(filename, "r", encoding="windows-1251") as file:
-            reader = csv.reader(file, delimiter=";")
-            headers = next(reader)
+        with open(archivo, "r", encoding="windows-1251") as f:
+            reader = csv.reader(f, delimiter=";")
+            next(reader)
             for row in reader:
                 if len(row) > 3:
-                    books.append(row)
+                    libros.append(row)
     except FileNotFoundError:
-        print(f"Ошибка: Файл {filename} не найден.")
+        print(f"Error: No se encontró el archivo {archivo}")
         return
 
-    # ВАЖНО: Проверьте индексы столбцов в вашем файле и измените их, если нужно
-    # Стандартная структура часто бывает: 0-ID, 1-Название, 2-Автор, 3-Год, 4-Издательство, 5-Популярность
-    IDX_TITLE = 1
-    IDX_AUTHOR = 2
-    IDX_YEAR = 3
-    IDX_PUBLISHER = 4
-    IDX_POPULARITY = 5 # Или другой столбец, содержащий числа просмотров/скачиваний
+    idx_titulo = 1
+    idx_autor = 2
+    idx_anio = 3
+    idx_editorial = 4
+    idx_popularidad = 5
 
-    # 1. Вывести количество записей, у которых в поле Название строка длиннее 30 символов
-    long_titles = sum(1 for book in books if len(book[IDX_TITLE]) > 30)
-    print(f"1. Количество книг с названием длиннее 30 символов: {long_titles}")
+    titulos_largos = sum(1 for libro in libros if len(libro[idx_titulo]) > 30)
+    print(f"1. Libros con título mayor a 30 caracteres: {titulos_largos}")
 
-    # 2. Поиск книги по автору с ограничением (Вариант 3: Только 2014, 2016 и 2017 года)
-    search_author = input("2. Введите имя автора для поиска: ").strip().lower()
-    allowed_years = {"2014", "2016", "2017"}
+    autor_buscado = input("2. Autor a buscar: ").strip().lower()
+    anios_permitidos = {"2014", "2016", "2017"}
     
-    search_results = [
-        book for book in books 
-        if search_author in book[IDX_AUTHOR].lower() and str(book[IDX_YEAR]) in allowed_years
+    resultados = [
+        libro for libro in libros 
+        if autor_buscado in libro[idx_autor].lower() and str(libro[idx_anio]) in anios_permitidos
     ]
     
-    print(f"   Найдено книг автора в {allowed_years}: {len(search_results)}")
-    for b in search_results:
-        print(f"   - {b[IDX_TITLE]} ({b[IDX_YEAR]})")
+    print(f"   Resultados encontrados ({', '.join(anios_permitidos)}): {len(resultados)}")
+    for b in resultados:
+        print(f"   - {b[idx_titulo]} ({b[idx_anio]})")
 
-    # 3. Генератор библиографических ссылок для 20 записей
-    if len(books) >= 20:
-        random_books = random.sample(books, 20)
-        with open("references.txt", "w", encoding="utf-8") as f_out:
-            for i, book in enumerate(random_books, 1):
-                f_out.write(f"{i}. {book[IDX_AUTHOR]}. {book[IDX_TITLE]} - {book[IDX_YEAR]}\n")
-        print("3. Сгенерирован файл 'references.txt' с 20 ссылками.")
-    else:
-        print("3. Недостаточно книг для генерации 20 ссылок.")
+    if len(libros) >= 20:
+        seleccion = random.sample(libros, 20)
+        with open("referencias.txt", "w", encoding="utf-8") as f_out:
+            for i, libro in enumerate(seleccion, 1):
+                f_out.write(f"{i}. {libro[idx_autor]}. {libro[idx_titulo]} - {libro[idx_anio]}\n")
+        print("3. Archivo 'referencias.txt' creado con éxito.")
 
-    # --- ДОПЗАДАНИЕ ---
-    print("\n--- Дополнительное задание ---")
+    print("\n--- Tareas adicionales ---")
     
-    # Вывести перечень всех издательств без повторений
-    publishers = set()
-    for book in books:
-        if len(book) > IDX_PUBLISHER:
-            publishers.add(book[IDX_PUBLISHER].strip())
-    print(f"Количество уникальных издательств: {len(publishers)}")
-    # print(publishers) # Раскомментируйте, чтобы вывести сам список
+    editoriales = set()
+    for libro in libros:
+        if len(libro) > idx_editorial:
+            editoriales.add(libro[idx_editorial].strip())
+    print(f"Total de editoriales únicas: {len(editoriales)}")
 
-    # Самые популярные 20 книг
     try:
-        sorted_books = sorted(books, key=lambda x: int(x[IDX_POPULARITY]) if x[IDX_POPULARITY].isdigit() else 0, reverse=True)
-        print("Топ 20 самых популярных книг:")
-        for i in range(min(20, len(sorted_books))):
-            print(f"  {i+1}. {sorted_books[i][IDX_TITLE]} (Популярность: {sorted_books[i][IDX_POPULARITY]})")
+        libros_ordenados = sorted(libros, key=lambda x: int(x[idx_popularidad]) if x[idx_popularidad].isdigit() else 0, reverse=True)
+        print("Top 20 libros más populares:")
+        for i in range(min(20, len(libros_ordenados))):
+            print(f"  {i+1}. {libros_ordenados[i][idx_titulo]} (Puntuación: {libros_ordenados[i][idx_popularidad]})")
     except IndexError:
-        print("Не удалось определить популярность. Проверьте индекс IDX_POPULARITY.")
+        pass
 
-def process_xml(filename="currency.xml"):
-    print("\n--- Обработка XML ---")
+def procesar_xml(archivo="currency.xml"):
+    print("\n--- Procesamiento XML ---")
     try:
-        tree = ET.parse(filename)
+        tree = ET.parse(archivo)
         root = tree.getroot()
         
-        # Вариант 3: Список Name, но только для валют с Nominal=1
-        print("Список валют (Nominal = 1):")
-        found = False
+        print("Monedas con Nominal = 1:")
+        encontrado = False
         
         for valute in root.findall('Valute'):
             nominal = valute.find('Nominal')
-            name = valute.find('Name')
+            nombre = valute.find('Name')
             
-            if nominal is not None and name is not None:
+            if nominal is not None and nombre is not None:
                 if nominal.text.strip() == "1":
-                    print(f"- {name.text}")
-                    found = True
+                    print(f"- {nombre.text}")
+                    encontrado = True
                     
-        if not found:
-            print("Валют с номиналом 1 не найдено.")
+        if not encontrado:
+            print("No se encontraron resultados.")
             
     except FileNotFoundError:
-        print(f"Ошибка: Файл {filename} не найден.")
+        print(f"Error: No se encontró el archivo {archivo}")
     except ET.ParseError:
-        print(f"Ошибка: Файл {filename} имеет неверный формат XML.")
+        print(f"Error: Formato inválido en {archivo}")
 
 if __name__ == "__main__":
-    process_csv("books.csv")
-    process_xml("currency.xml")
+    procesar_libros()
+    procesar_xml()
