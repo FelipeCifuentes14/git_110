@@ -1,5 +1,5 @@
 def dibujar_patron():
-    print("--- 2. Patrón ---")
+    print("--- 2. Pattern ---")
     ancho = 40
     alto = 5
     

@@ -6,7 +6,7 @@ YELLOW_BG = '\033[43m'
 RESET = '\033[0m'
 
 def analizar_secuencia():
-    print("--- 4. Análisis de sequence.txt ---")
+    print("--- 4. Analysis of sequence.txt ---")
 
     with open("sequence.txt") as archivo:
         numeros = [float(n) for n in archivo.read().split()]
@@ -16,7 +16,7 @@ def analizar_secuencia():
     total = suma_pares + suma_impares
 
     if total == 0:
-        print("No hay datos para analizar.")
+        print("No data")
         return
 
     porc_pares = suma_pares / total * 100
@@ -30,6 +30,9 @@ def analizar_secuencia():
     bloques_impares = ancho_barra - bloques_pares
 
     print("Diagrama (Verde = Pares, Amarillo = Impares):")
+    
+    print("\n")
+    
     print(GREEN_BG + " " * bloques_pares + YELLOW_BG + " " * bloques_impares + RESET)
     print("\n")
     

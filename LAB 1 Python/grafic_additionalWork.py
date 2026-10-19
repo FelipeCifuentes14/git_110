@@ -1,5 +1,5 @@
 def dibujar_grafico():
-    print("--- Tarea Extra: Gráfico y = 2x ---")
+    print("--- AdditionalWork Grafic y = 2x ---")
     alto = 9 
     ancho = 10
     
