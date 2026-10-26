@@ -1,91 +1,143 @@
+
 import csv
-import random
 import xml.etree.ElementTree as ET
 
-def procesar_libros(archivo="books.csv"):
-    libros = []
-    
-    try:
-        with open(archivo, "r", encoding="windows-1251") as f:
-            reader = csv.reader(f, delimiter=";")
-            next(reader)
-            for row in reader:
-                if len(row) > 3:
-                    libros.append(row)
-    except FileNotFoundError:
-        print(f"Error: No se encontró el archivo {archivo}")
-        return
 
-    idx_titulo = 1
-    idx_autor = 2
-    idx_anio = 3
-    idx_editorial = 4
-    idx_popularidad = 5
+# Elegir el archivo de libros
 
-    titulos_largos = sum(1 for libro in libros if len(libro[idx_titulo]) > 30)
-    print(f"1. Libros con título mayor a 30 caracteres: {titulos_largos}")
 
-    autor_buscado = input("2. Autor a buscar: ").strip().lower()
-    anios_permitidos = {"2014", "2016", "2017"}
-    
-    resultados = [
-        libro for libro in libros 
-        if autor_buscado in libro[idx_autor].lower() and str(libro[idx_anio]) in anios_permitidos
-    ]
-    
-    print(f"   Resultados encontrados ({', '.join(anios_permitidos)}): {len(resultados)}")
-    for b in resultados:
-        print(f"   - {b[idx_titulo]} ({b[idx_anio]})")
 
-    if len(libros) >= 20:
-        seleccion = random.sample(libros, 20)
-        with open("referencias.txt", "w", encoding="utf-8") as f_out:
-            for i, libro in enumerate(seleccion, 1):
-                f_out.write(f"{i}. {libro[idx_autor]}. {libro[idx_titulo]} - {libro[idx_anio]}\n")
-        print("3. Archivo 'referencias.txt' creado con éxito.")
+# Leer los libros
+with open("books-en.csv", "r", encoding ="latin-1", newline = "") as f:
+    lector = csv.DictReader(f,delimiter=";")
+    libros = list(lector)
 
-    print("\n--- Tareas adicionales ---")
-    
-    editoriales = set()
-    for libro in libros:
-        if len(libro) > idx_editorial:
-            editoriales.add(libro[idx_editorial].strip())
-    print(f"Total de editoriales únicas: {len(editoriales)}")
+# Mostrar las columnas del archivo
+print("Columnas:", libros[0].keys())
 
-    try:
-        libros_ordenados = sorted(libros, key=lambda x: int(x[idx_popularidad]) if x[idx_popularidad].isdigit() else 0, reverse=True)
-        print("Top 20 libros más populares:")
-        for i in range(min(20, len(libros_ordenados))):
-            print(f"  {i+1}. {libros_ordenados[i][idx_titulo]} (Puntuación: {libros_ordenados[i][idx_popularidad]})")
-    except IndexError:
-        pass
 
-def procesar_xml(archivo="currency.xml"):
-    print("\n--- Procesamiento XML ---")
-    try:
-        tree = ET.parse(archivo)
-        root = tree.getroot()
-        
-        print("Monedas con Nominal = 1:")
-        encontrado = False
-        
-        for valute in root.findall('Valute'):
-            nominal = valute.find('Nominal')
-            nombre = valute.find('Name')
-            
-            if nominal is not None and nombre is not None:
-                if nominal.text.strip() == "1":
-                    print(f"- {nombre.text}")
-                    encontrado = True
-                    
-        if not encontrado:
-            print("No se encontraron resultados.")
-            
-    except FileNotFoundError:
-        print(f"Error: No se encontró el archivo {archivo}")
-    except ET.ParseError:
-        print(f"Error: Formato inválido en {archivo}")
+while True:
+    print("\n--- LABORATORIO 2 ---")
+    print("1. Contar titulos largos")
+    print("2. Buscar libros por autor")
+    print("3. Crear referencias bibliograficas")
+    print("4. Leer monedas del XML")
+    print("5. Mostrar etiquetas sin repetir")
+    print("6. Mostrar los 20 libros mas populares")
+    print("0. Salir")
 
-if __name__ == "__main__":
-    procesar_libros()
-    procesar_xml()
+    opcion = input("Elige una opcion: ")
+
+    # 1. Contar titulos de mas de 30 caracteres
+    if opcion == "1":
+        cantidad = 0
+
+        for libro in libros:
+            if len(libro["Book-Title"]) > 30:
+                cantidad += 1
+
+        print("Cantidad de titulos largos:", cantidad)
+
+    # 2. Buscar libros por autor
+    elif opcion == "2":
+        autor_buscado = input("Escribe el autor: ").lower()
+        encontrados = 0
+
+        for libro in libros:
+            autor = libro["Book-Author"].lower()
+            anio = libro["Year-Of-Publication"]
+
+            if autor_buscado in autor:
+                if anio <= "1990":
+                    print(
+                        libro["Book-Title"],
+                        "-", libro["Book-Author"],
+                        "-", anio
+                    )
+                    encontrados += 1
+
+        if encontrados == 0:
+            print("No se encontraron libros con ese autor y esos años.")
+
+    # 3. Crear referencias bibliograficas
+    elif opcion == "3":
+        with open("referencias.txt", "w", encoding="utf-8") as f:
+            numero = 1
+
+            for libro in libros[:20]:
+                referencia = (
+                    str(numero) + ". "
+                    + libro["Book-Author"] + ". "
+                    + libro["Book-Title"] + " - "
+                    + libro["Year-Of-Publication"]
+                )
+
+                f.write(referencia + "\n")
+                numero += 1
+
+        print("Se ha creado el archivo referencias.txt")
+
+    # 4. Leer monedas del XML
+    elif opcion == "4":
+        arbol = ET.parse("currency.xml")
+        raiz = arbol.getroot()
+
+        nombres = []
+
+        for moneda in raiz.iter("Valute"):
+            nominal = moneda.find("Nominal").text
+            nombre = moneda.find("Name").text
+
+            if nominal == "1":
+                nombres.append(nombre)
+
+        print("Monedas con nominal igual a 1:")
+        print(nombres)
+
+    # 5. Mostrar etiquetas sin repetir
+    elif opcion == "5":
+        etiquetas = []
+
+        for libro in libros:
+            if "Теги" in libro:
+                texto = libro["Теги"]
+
+                for etiqueta in texto.split(","):
+                    etiqueta = etiqueta.strip()
+
+                    if etiqueta != "" and etiqueta not in etiquetas:
+                        etiquetas.append(etiqueta)
+
+        etiquetas.sort()
+
+        for etiqueta in etiquetas:
+            print(etiqueta)
+
+    # 6. Mostrar los 20 libros mas populares
+    elif opcion == "6":
+        frecuencia = {}
+
+        for libro in libros:
+            titulo = libro["Book-Title"]
+
+            if titulo in frecuencia:
+                frecuencia[titulo] += 1
+            else:
+                frecuencia[titulo] = 1
+
+        populares = sorted(
+            frecuencia,
+            key=frecuencia.get,
+            reverse=True
+        )
+
+        for titulo in populares[:20]:
+            print(titulo, "-", frecuencia[titulo], "apariciones")
+
+    # Salir
+    elif opcion == "0":
+        print("Programa terminado.")
+        break
+
+    else:
+        print("Opcion incorrecta.")
